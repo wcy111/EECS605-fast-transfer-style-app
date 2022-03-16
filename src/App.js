@@ -4,11 +4,12 @@ import React from 'react';
 // atob is deprecated but this function converts base64string to text string
 const decodeFileBase64 = (base64String) => {
   // From Bytestream to Percent-encoding to Original string
-  return decodeURIComponent(
-    atob(base64String).split("").map(function (c) {
-      return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join("")
-  );
+  return "data:image/png;base64," + base64String
+  // decodeURIComponent(
+  //   atob(base64String).split("").map(function (c) {
+  //     return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+  //   }).join("")
+  // );
 };
 
 
@@ -65,7 +66,7 @@ function App() {
 
     // make POST request
     console.log('making POST request...');
-    fetch('<api-url>', {
+    fetch('https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/prod/', {
       method: 'POST',
       headers: { "Content-Type": "application/json", "Accept": "text/plain" },
       body: JSON.stringify({ "image": inputFileData })
@@ -106,7 +107,8 @@ function App() {
       </div>
       <div className="Output">
         <h1>Results</h1>
-        <p>{outputFileData}</p>
+        {/* <p>{outputFileData}</p> */}
+        <img src={outputFileData} alt=""/>
       </div>
     </div>
   );
