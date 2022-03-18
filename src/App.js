@@ -18,6 +18,7 @@ function App() {
   const [outputFileData, setOutputFileData] = React.useState(''); // represented as readable data (text string)
   const [buttonDisable, setButtonDisable] = React.useState(true);
   const [buttonText, setButtonText] = React.useState('Submit');
+  // preview input image
 
   // convert file to bytes data
   const convertFileToBytes = (inputFile) => {
@@ -39,12 +40,12 @@ function App() {
   // handle file input
   const handleChange = async (event) => {
     // Clear output text.
+    
     setOutputFileData("");
 
     console.log('newly uploaded file');
     const inputFile = event.target.files[0];
     console.log(inputFile);
-
     // convert file to bytes data
     const base64Data = await convertFileToBytes(inputFile);
     const base64DataArray = base64Data.split('base64,'); // need to get rid of 'data:image/png;base64,' at the beginning of encoded string
@@ -54,12 +55,25 @@ function App() {
 
     // enable submit button
     setButtonDisable(false);
-  }
+  };
+  // image background
+  const myStyle={
+    backgroundImage: 
+//"url('https://media.geeksforgeeks.org/wp-content/uploads/rk.png')"//,
+"url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3xyRmW79jSj2ljzM6NlPr0ExRH9Dcm93Zxg&usqp=CAU",
+// "url('https://wallpapercave.com/dwp2x/fuKCPDK.jpg')"//,
+
+    height:'100vh',
+    marginTop:'-60px',
+    fontSize:'50px',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+};
 
   // handle file submission
   const handleSubmit = (event) => {
     event.preventDefault();
-
+    
     // temporarily disable submit button
     setButtonDisable(true);
     setButtonText('Loading Result');
@@ -74,7 +88,7 @@ function App() {
     .then(data => {
       console.log('getting response...')
       console.log(data);
-
+    
       // POST request error
       if (data.statusCode === 400) {
         const outputErrorMessage = JSON.parse(data.errorMessage)['outputResultsData'];
@@ -97,20 +111,46 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <div className="Input">
-        <h1>Input</h1>
-        <form onSubmit={handleSubmit}>
-          <input type="file" accept=".png" onChange={handleChange} />
-          <button type="submit" disabled={buttonDisable}>{buttonText}</button>
-        </form>
+  
+    <div className="App"  style={myStyle}>
+
+      <h2>Fast style transfer</h2>
+      <div className="Image">
+      <img src="https://picmatix.com/static/index/img/leopard.jpg" height = "250" />
+      <img src="https://picmatix.com/static/index/img/catrina-street-art-512.jpg" height = "250" />
+      <img src="https://picmatix.com/static/index/img/leopard-street-art.jpg" height = "250" />
+      <p fontSize="1"><strong>1. Input is expected to be a small size file named content.png in advance
+      <br></br>
+      2. Output is a style transfomed image file with size 224*224 pixels </strong></p>
       </div>
+      <div className="Input" style={myStyle}>
+        <h2>Input</h2>
+        <form onSubmit={handleSubmit}>
+          {/* <label class = "custom-file-upload">
+          <input type="file" accept=".png"   onChange={handleChange} />
+          Custom Upload
+          
+          </label> */}
+
+          <label for="file-upload" class="button-6">
+         <i class="fa fa-cloud-upload"></i>  Upload Image
+          </label>
+        <input id="file-upload" type="file" accept=".png"   onChange={handleChange}/>
+        <div>
+        <button type="Submit" class="button-6"  disabled={buttonDisable}>{buttonText}</button>
+        </div>
+        </form>
+        {/* <img src={inputFileData} alt="None"/> */}
+
       <div className="Output">
-        <h1>Results</h1>
+        <h2>Results</h2>
         {/* <p>{outputFileData}</p> */}
+        
         <img src={outputFileData} alt=""/>
       </div>
     </div>
+    </div>
+
   );
 }
 
