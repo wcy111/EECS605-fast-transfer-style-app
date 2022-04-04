@@ -13,7 +13,6 @@ const decodeFileBase64 = (base64String) => {
   // );
 };
 
-
 function App() {
 
   const [inputFileData, setInputFileData] = React.useState(''); // represented as bytes data (string)
@@ -21,6 +20,14 @@ function App() {
   const [buttonDisable, setButtonDisable] = React.useState(true);
   const [buttonText, setButtonText] = React.useState('Submit');
   // preview input image
+  const [selectedDropdownFile, setSelectedDropdownFile] = React.useState('');
+  const [buttonDisable_demo, setButtonDisable_demo] = React.useState(true);
+  const [submitButtonText, setSubmitButtonText] = React.useState('Submit');
+  const [inputFileData_demo, setInputFileData_demo] = React.useState(''); // represented as bytes data (string)
+  const [inputImage, setInputImage] = React.useState(''); // represented as bytes data (string)
+  const [demoDropdownFiles, setDemoDropdownFiles] = React.useState([]);
+  const [outputFileData_demo, setOutputFileData_demo] = React.useState(''); // represented as readable data (text string)
+  const [fileButtonText, setFileButtonText] = React.useState('Upload File');
 
   // convert file to bytes data
   const convertFileToBytes = (inputFile) => {
@@ -38,7 +45,6 @@ function App() {
       };
     });
   }
-
   // handle file input
   const handleChange = async (event) => {
     // Clear output text.
@@ -59,11 +65,12 @@ function App() {
     setButtonDisable(false);
   };
   // image background
+
   const myStyle={
-    backgroundImage: 
-//"url('https://media.geeksforgeeks.org/wp-content/uploads/rk.png')"//,
-"url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3xyRmW79jSj2ljzM6NlPr0ExRH9Dcm93Zxg&usqp=CAU",
-// "url('https://wallpapercave.com/dwp2x/fuKCPDK.jpg')"//,
+//     backgroundImage: 
+// //"url('https://media.geeksforgeeks.org/wp-content/uploads/rk.png')"//,
+// "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3xyRmW79jSj2ljzM6NlPr0ExRH9Dcm93Zxg&usqp=CAU",
+// // "url('https://wallpapercave.com/dwp2x/fuKCPDK.jpg')"//,
 
     height:'100vh',
     marginTop:'-60px',
@@ -114,9 +121,119 @@ function App() {
       console.log('POST request success');
     })
   }
+
+
+//--------------------------------- Demo part -----------------------------------//
+const DROPDOWN_API_ENDPOINT = 'https://tz5cv9f9pb.execute-api.us-east-1.amazonaws.com/prod'; // TODO
+// const ML_API_ENDPOINT = 'https://9xmmdlqzi4.execute-api.us-east-1.amazonaws.com/prod'; // TODO
+const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/prod/'; // TODO
+
+// const decodeFileBase64_demo = (base64String) => {
+//   // From Bytestream to Percent-encoding to Original string
+//   return decodeURIComponent(
+//     atob(base64String).split("").map(function (c) {
+//       return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+//     }).join("")
+//   );
+// };
+
+  // make GET request to get demo files on load -- takes a second to load
+  React.useEffect(() => {
+    fetch(DROPDOWN_API_ENDPOINT)
+    .then(response => response.json())
+    .then(data => {
+      // GET request error
+      if (data.statusCode === 400) {
+        console.log('Sorry! There was an error, the demo files are currently unavailable.')
+      }
+
+      // GET request success
+      else {
+        const s3BucketFiles = JSON.parse(data.body);
+        setDemoDropdownFiles(s3BucketFiles["s3Files"]);
+      }
+    });
+  }, [])
+
+
+
+
+ // handle demo dropdown file selection
+ const handleDropdown = (event) => {
+  setSelectedDropdownFile(event.target.value);
+
+  // temporarily disable submit button
+  setButtonDisable_demo(true);
+  setSubmitButtonText('Loading Demo File...');
+
+  // only make POST request on file selection
+  if (event.target.value) {
+    fetch(DROPDOWN_API_ENDPOINT, {
+      method: 'POST',
+      body: JSON.stringify({ "fileName": event.target.value })
+    }).then(response => response.json())
+    .then(data => {
+
+      // POST request error
+      if (data.statusCode === 400) {
+        console.log('Uh oh! There was an error retrieving the dropdown file from the S3 bucket.')
+      }
+
+      // POST request success
+      else {
+        const dropdownFileBytesData = JSON.parse(data.body)['bytesData'];
+        setInputFileData_demo(dropdownFileBytesData);
+        setInputImage('data:image/png;base64,' + dropdownFileBytesData); // hacky way of setting image from bytes data - even works on .jpeg lol
+        setSubmitButtonText('Submit');
+        setButtonDisable_demo(false);
+        
+    }
+    });
+  }
+  
+  else {
+    setInputFileData('');
+  }
+
+}
+
+
+  // handle file submission
+  const handleSubmit_demo = (event) => {
+    event.preventDefault();
+
+    // temporarily disable submit button
+    setButtonDisable(true);
+    setSubmitButtonText('Loading Result...');
+
+    // make POST request
+    fetch(ML_API_ENDPOINT, {
+      method: 'POST',
+      headers: { "Content-Type": "application/json", "Accept": "text/plain" },
+      body: JSON.stringify({ "image": inputFileData_demo })
+    }).then(response => response.json())
+    .then(data => {
+      // POST request error
+      if (data.statusCode === 400) {
+        const outputErrorMessage = JSON.parse(data.errorMessage)['outputResultsData'];
+        setOutputFileData_demo(outputErrorMessage);
+      }
+
+      // POST request success
+      else {
+        const outputBytesData = JSON.parse(data.body)['outputResultsData'];
+        setOutputFileData_demo('data:image/png;base64,' + outputBytesData);
+      }
+
+      // re-enable submit button
+      setButtonDisable(false);
+      setSubmitButtonText('Submit');
+    })
+  }
+
+//------------------------------------------------//
   const App = () => (
     <div className='app'>
-      <h1>Portfolio Website</h1>
       <Navigation />
       <Main />
      </div>
@@ -125,27 +242,34 @@ function App() {
     <nav>
       <ul>
         <li><NavLink exact activeClassName="current" to='/'>Home</NavLink></li>
-        <p>"%20%20%20%20%20"</p>
-        <li><NavLink exact activeClassName="current" to='/about'>About</NavLink></li>
+        <li><NavLink exact activeClassName="current" to='/about'>Demo</NavLink></li>
       </ul>
     </nav>
   );
   const Home = () => (
     <div className='home'>
-      <p> Feel free to browse around and learn more about me.</p>
       <div className="Image">
-      <img src="https://picmatix.com/static/index/img/leopard.jpg" height = "250" />
-      <img src="https://picmatix.com/static/index/img/catrina-street-art-512.jpg" height = "250" />
-      <img src="https://picmatix.com/static/index/img/leopard-street-art.jpg" height = "250" />
-      <p fontSize="1"><strong>
+      <img src="https://picmatix.com/static/index/img/leopard.jpg" height = "300" />
+      <img src="https://picmatix.com/static/index/img/catrina-street-art-512.jpg" height = "300" />
+      <img src="https://picmatix.com/static/index/img/leopard-street-art.jpg" height = "300" />
+      <h6>
+      {/* <p ><strong> */}
+      <br></br>
+      <br></br>
+
       1. Input is expected to be a small size file named content.png in advance
       <br></br>
+      <br></br>
+
       <pr></pr>
-      2. Output is a style transfomed image file with size 224*224 pixels </strong></p>
-      </div>
-      {/* ------Input------- */}
-      <div className="Input" >
-        <h2>Input</h2>
+      2. Output is a style transfomed image file with size 224*224 pixels 
+      {/* </strong></p> */}
+      </h6>
+      <div class="float-container">
+
+<div class="float-child">
+  <div class="green">Input</div>
+  <div className="Input" >
         <form onSubmit={handleSubmit}>
           <label for="file-upload" class="button-6">
          <i class="fa fa-cloud-upload"></i>  Upload Image
@@ -156,22 +280,69 @@ function App() {
         </div>
         </form>
       </div>
-      {/* ------Output------- */}
-      <div className="Output">
-        <h2>Result</h2>
+  
+  </div>
+
+<div class="float-child">
+  <div class="blue">Output</div>
+  <div className="Output">
         {/* <p>{outputFileData}</p> */}
         
         <img src={outputFileData} alt=""/>
     
     </div>
+</div>
+
+</div>
+      
+      </div>
+      {/* ------Input------- */}
+    
+      
+      {/* ------Output------- */}
+     
     </div>
   );
   const About = () => (
     <div className='about'>
-      <h1>About Me</h1>
-      <p>Ipsum dolor dolorem consectetur est velit fugiat. Dolorem provident corporis fuga saepe distinctio ipsam? Et quos harum excepturi dolorum molestias?</p>
-      <p>Ipsum dolor dolorem consectetur est velit fugiat. Dolorem provident corporis fuga saepe distinctio ipsam? Et quos harum excepturi dolorum molestias?</p>
-    
+<div class="float-container">
+
+<div class="float-child">
+  <div class="green"></div>
+      <label htmlFor="demo-dropdown">Demo: </label>
+        <select name="Select Image" id="demo-dropdown" value={selectedDropdownFile} onChange={handleDropdown}>
+            <option value="">-- Select Demo File --</option>
+            {demoDropdownFiles.map((file) => <option key={file} value={file}>{file}</option>)}
+        </select>
+        <img src={inputImage} alt=""  height = "300" width = "400"/>
+
+       <form onSubmit={handleSubmit_demo}>
+          <label htmlFor="file-upload">{fileButtonText}</label>
+          <input type="file" id="file-upload" onChange={handleChange} />
+          <button type="submit" disabled={buttonDisable_demo}>{submitButtonText}</button>
+        </form>
+
+
+
+</div>
+
+<div class="float-child">
+  <div class="blue"></div>
+<h3>Result</h3>
+  <div className="Output">
+        <h2><img src={outputFileData_demo} alt=""  height = "300" width = "400" /></h2>
+
+
+</div>
+
+</div>
+
+
+
+
+
+
+      </div>
     </div>
   );
   const Main = () => (
@@ -184,9 +355,15 @@ function App() {
     
     <div className="App"  style={myStyle}>
       <br></br>
-      
       <div className='app'>
       <h1>Fast style transfer</h1>
+
+
+
+   
+
+
+      </div>
       <Navigation />
       <Main />
       </div>
@@ -195,7 +372,6 @@ function App() {
     
 
     
-  </div>
   );
   
 }

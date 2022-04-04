@@ -83,3 +83,15 @@ html {
     p {
       margin-bottom: 15px;
     }
+
+  .float-container {
+      border: 3px solid #fff;
+      padding: 30px;
+  }
+  
+  .float-child {
+      width: 50%;
+      float: left;
+      padding: 30px;
+      border: 2px solid white;
+  }  
