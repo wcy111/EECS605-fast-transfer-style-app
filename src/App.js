@@ -190,11 +190,9 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
     }
     });
   }
-  
   else {
     setInputFileData('');
   }
-
 }
 
 
@@ -270,6 +268,7 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
 <div class="float-child">
   <div class="green">Input</div>
   <div className="Input" >
+    <br></br>
         <form onSubmit={handleSubmit}>
           <label for="file-upload" class="button-6">
          <i class="fa fa-cloud-upload"></i>  Upload Image
@@ -288,7 +287,7 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
   <div className="Output">
         {/* <p>{outputFileData}</p> */}
         
-        <img src={outputFileData} alt=""/>
+        <img src={outputFileData}  height = "300" width = "400"/>
     
     </div>
 </div>
@@ -296,10 +295,7 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
 </div>
       
       </div>
-      {/* ------Input------- */}
-    
-      
-      {/* ------Output------- */}
+
      
     </div>
   );
@@ -314,7 +310,7 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
             <option value="">-- Select Demo File --</option>
             {demoDropdownFiles.map((file) => <option key={file} value={file}>{file}</option>)}
         </select>
-        <img src={inputImage} alt=""  height = "300" width = "400"/>
+        <img src={inputImage}   height = "300" width = "400"/>
 
        <form onSubmit={handleSubmit_demo}>
           <label htmlFor="file-upload">{fileButtonText}</label>
