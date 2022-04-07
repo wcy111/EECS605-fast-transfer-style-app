@@ -13,6 +13,7 @@ const decodeFileBase64 = (base64String) => {
   // );
 };
 
+
 function App() {
 
   const [inputFileData, setInputFileData] = React.useState(''); // represented as bytes data (string)
@@ -30,6 +31,13 @@ function App() {
   const [fileButtonText, setFileButtonText] = React.useState('Upload File');
 
   // convert file to bytes data
+  const handleImgError = () =>{
+    setInputImage("https://thumbs.dreamstime.com/b/transparent-designer-must-have-fake-background-39672616.jpg")
+    setInputFileData_demo("https://thumbs.dreamstime.com/b/transparent-designer-must-have-fake-background-39672616.jpg")
+    setOutputFileData_demo("https://thumbs.dreamstime.com/b/transparent-designer-must-have-fake-background-39672616.jpg")
+    setOutputFileData("https://thumbs.dreamstime.com/b/transparent-designer-must-have-fake-background-39672616.jpg")
+  }
+
   const convertFileToBytes = (inputFile) => {
     console.log('converting file to bytes...');
     return new Promise((resolve, reject) => {
@@ -287,7 +295,7 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
   <div className="Output">
         {/* <p>{outputFileData}</p> */}
         
-        <img src={outputFileData}  height = "300" width = "400"/>
+        <img src={outputFileData}  height = "300" width = "400" onError={handleImgError}/>
     
     </div>
 </div>
@@ -310,7 +318,7 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
             <option value="">-- Select Demo File --</option>
             {demoDropdownFiles.map((file) => <option key={file} value={file}>{file}</option>)}
         </select>
-        <img src={inputImage}   height = "300" width = "400"/>
+        <img src={inputImage}   height = "300" width = "400" onError={handleImgError}/>
 
        <form onSubmit={handleSubmit_demo}>
           <label htmlFor="file-upload">{fileButtonText}</label>
@@ -326,7 +334,7 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
   <div class="blue"></div>
 <h3>Result</h3>
   <div className="Output">
-        <h2><img src={outputFileData_demo} alt=""  height = "300" width = "400" /></h2>
+        <h2><img src={outputFileData_demo} alt=""  height = "300" width = "400" onError={handleImgError} /></h2>
 
 
 </div>
