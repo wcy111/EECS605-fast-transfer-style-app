@@ -1,7 +1,6 @@
 import './App.css';
 import React from 'react';
 import { NavLink, Routes, Route } from 'react-router-dom';
-
 // atob is deprecated but this function converts base64string to text string
 const decodeFileBase64 = (base64String) => {
   // From Bytestream to Percent-encoding to Original string
@@ -249,6 +248,8 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
       <ul>
         <li><NavLink exact activeClassName="current" to='/'>Home</NavLink></li>
         <li><NavLink exact activeClassName="current" to='/about'>Demo</NavLink></li>
+        <li><NavLink exact activeClassName="current" to='/report'>Report</NavLink></li>
+
       </ul>
     </nav>
   );
@@ -307,6 +308,13 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
      
     </div>
   );
+
+  const Report = () => (
+    <div className='report'>
+        <object data = "Technical_Report_for_EECS605.pdf"  type="application/pdf" width="1500" height="1000">
+  </object>
+      </div>
+  )
   const About = () => (
     <div className='about'>
 <div class="float-container">
@@ -353,6 +361,8 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
     <Routes>
       <Route exact path='/' element={<Home/>}></Route>
       <Route exact path='/about' element={<About/>}></Route>
+      <Route exact path='/report' element={<Report/>}></Route>
+
     </Routes>
   );
   return (
