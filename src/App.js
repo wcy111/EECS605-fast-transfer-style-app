@@ -256,8 +256,6 @@ const ML_API_ENDPOINT = 'https://fz8ls39crb.execute-api.us-east-1.amazonaws.com/
   const Home = () => (
     <div className='home'>
       <div className="Image">
-//       <img src="https://picmatix.com/static/index/img/leopard.jpg" height = "300" />
-//       <img src="https://picmatix.com/static/index/img/catrina-street-art-512.jpg" height = "300" />
       <img src="https://inst.eecs.berkeley.edu/~cs194-26/sp20/upload/files/projFinalProposed/cs194-26-agr/assets/berkeley_cubist.png" height = "300" />
       <h6>
       {/* <p ><strong> */}
